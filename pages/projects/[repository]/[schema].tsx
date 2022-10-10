@@ -35,7 +35,8 @@ export default function Page() {
                 collections.length > 0 ? (
                     collections.map((collection, index) => {
                         return (
-                            <Link href={`/edit?file=${collection['name']}&sha=${collection['sha']}`}>
+                            <Link key={index}
+                                href={`/edit?repository=${repository}&schema=${schema}&file=${collection['name']}&sha=${collection['sha']}`}>
                                 <p className='cursor-pointer underline'> {collection['name']}</p>
                             </Link>
                         )
