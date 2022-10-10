@@ -10,7 +10,7 @@ module.exports = {
         repositories: {
             'bikinspace': {
                 'post' : '/content/posts',
-                'link' : '/content/links'
+                'link' : '/content/link'
             }
         }
     }

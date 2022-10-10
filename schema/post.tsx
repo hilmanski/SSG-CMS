@@ -1,4 +1,4 @@
-import { SchemaType } from './types'
+import { SchemaType } from '../types'
 
 // sample blog content
 

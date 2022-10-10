@@ -1,6 +1,6 @@
 import type { NextPage } from 'next'
 import Link from 'next/link'
-import CMSConfig from 'cms.config'
+import CMSConfig from '../cms.config'
 
 const Home: NextPage = () => {
   
