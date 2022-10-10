@@ -1,6 +1,6 @@
-import { SchemaType } from '../types'
+// This is user generated sample file
 
-// sample blog content
+import { SchemaType } from '../types'
 
 export default {
     name: 'post',
@@ -9,7 +9,8 @@ export default {
       {
         name: 'name',
         title: 'Name',
-        type: 'string'
+        type: 'string',
+        required: true
       }
     ]
   } as SchemaType

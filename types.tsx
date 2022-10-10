@@ -1,12 +1,16 @@
 
-interface Field {
+export interface FieldType {
     name: string
     title: string
     type: string
+    required: boolean
 }
 
-export interface SchemaType {
+export type SchemaType = {
     name: string
     title: string
-    fields: List[Field]
+    fields: FieldType[]
 }
+
+// create type list of [index: string]: SchemaType
+export type SchemaCollections = {[k: string] :SchemaType}

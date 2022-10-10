@@ -9,6 +9,8 @@ what's the normal case? people have different projects or only one?
 If(multiple) -> then dashboard show/choose between repo 
     based on file name like NextJS flow repo/[repoName]
  
+## Rules
+name only string , numebr, underscore and - (no whitespace)
 
 # About SSG Admin
 "SSG Admin" is a simple CMS for static site generator.  

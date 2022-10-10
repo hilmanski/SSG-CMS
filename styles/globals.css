@@ -10,3 +10,7 @@ body {
     width: 50%;
     font-size: 18px;
 }
+
+input, textarea {
+    color: #333;
+}
