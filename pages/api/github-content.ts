@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import dotenv from 'dotenv'
 import { Octokit } from "octokit";
-import CMSConfig from 'cms.config'
+import CMSConfig from '../../cms.config.js'
 
 
 dotenv.config()
