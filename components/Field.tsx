@@ -2,7 +2,6 @@
 import { FieldType } from '../types'
 
 export default function Field({ schemaProps }: { schemaProps: FieldType }){
-    console.log(schemaProps)
 
     let fieldString = '' as string;
     switch (schemaProps.type) {

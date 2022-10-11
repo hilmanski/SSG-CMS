@@ -5,6 +5,7 @@ import { SchemaType } from '../types'
 export default {
     name: 'link',
     title: 'Link',
+    asSlug: 'title',
     fields: [
       {
         name: 'title',
@@ -39,6 +40,11 @@ export default {
         name: 'date',
         title: 'Date',
         type: 'date',
+        required: true,
+      }, {
+        name: '_content_',
+        title: 'Content',
+        type: 'text',
         required: true,
       }
     ]

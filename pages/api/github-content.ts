@@ -9,6 +9,8 @@ const github_access_token = process.env.github_access_token
 const admin_secret_code = process.env.admin_secret_code
 const github_username = CMSConfig.github.username
 
+let github_content_dir = ''
+
 const octokit = new Octokit({
   auth: github_access_token,
 });
@@ -25,13 +27,20 @@ export default async function handler(
     })
   }
 
-  console.log('Repository: ', repository)
+  github_content_dir = CMSConfig.github.repositories[repository][schema]  
+  if(!github_content_dir || github_content_dir == '') {
+   console.error('Error on getting content dir info @_getContent at API')
+   throw new Error('Github Directory Not Found. Check you CMSConfig file')
+  }
 
+  //=================================
+  //====== GET METHOD ===============
+  //=================================
   if(req.method == 'GET') {
     // Single Content
     const {file} = req.query as typeof req.query & {file?: string}
     if(file !== undefined){
-      const rawContent = await _getContent(repository, schema, '/' + file)
+      const rawContent = await _getContent(repository, '/' + file)
       const content = _readBase64(rawContent.content)
       
       return res.status(200).json({
@@ -40,23 +49,25 @@ export default async function handler(
     }
 
     //All Contents
-    const files = await _getContent(repository, schema)
+    const files = await _getContent(repository)
     return res.status(200).json({
         body: files
     });
   }
 
-  res.status(200).json({ name: 'John Doe' })
+  //=================================
+  //====== POST AND PUT =============
+  //=================================
+  const reqBody = req.body
+  if (req.method === 'POST' || req.method === 'PUT') {
+      const data = await _postOrUpdateContent(repository, reqBody, req.method)
+      return res.status(200).json(({
+          body: data
+      }))
+  }
 }
 
-const _getContent = async(repository: string, schema: string, filename: string = '') => {
-  const github_content_dir = CMSConfig.github.repositories[repository][schema]
-  
-  if(!github_content_dir)  {
-   console.error('Error on getting content dir info @_getContent at API')
-   throw new Error('Github Directory Not Found. Check you CMSConfig file')
-  }
-
+const _getContent = async(repository: string, filename: string = '') => {
   let path = github_content_dir + filename
 
   const {data} = await octokit.rest.repos.getContent({
@@ -68,8 +79,113 @@ const _getContent = async(repository: string, schema: string, filename: string =
   return data
 }
 
+
+const _postOrUpdateContent = async(repository: string, body: any, method: string) => {
+  const parsedBody = JSON.parse(body)
+  const filename = _convertToSlug(parsedBody) + '.md'
+  
+  // Todo: generate content here based on markdown and schema/fields
+  const rawContent = _generateMarkdown(parsedBody) as string
+  const content = _writeBase64(rawContent)
+  const path = github_content_dir + '/' + filename
+  
+  let params = {
+      owner: github_username, 
+      repo: repository,
+      path: path,
+      message: `new content ${filename}`,
+      content: content
+  }
+
+  
+  // if(method == 'PUT') {
+  //     params.sha = body.sha
+  //     params.message = `update content ${filename}`
+  // }
+
+  try{ 
+    const {data} = await octokit.rest.repos.createOrUpdateFileContents(
+                          params
+                        )
+      return data
+  } catch(err) {
+      console.log("Error create or update file content to github")
+      console.log("err response:", err)
+      return err
+  }
+  
+}
+
+function _generateMarkdown(body: any) {
+  const schema = body.schema
+  const inputs = body.inputs
+
+  let headerPart: string = __genHeader(schema, inputs)
+  let contentPart: string = inputs._content_
+
+  return headerPart + '\n' + contentPart
+}
+
+function __genHeader(schema: any, inputs: any) {
+  let header = ''
+  schema.fields.map((key: any) => {
+    const _name = key.name
+    
+    // Skip _content_ -> not part of header
+    if(_name == '_content_')
+      return
+
+    let _value = ''
+    let _key = `${_name}`
+    switch(key.type) {
+      case 'string':
+      case 'text':
+          _value = `"${inputs[_name]}"`
+          break
+      case 'date':
+          let _date = new Date().toISOString()
+          
+          if(inputs[_name]) {
+            _date = new Date(inputs[_name]).toISOString()
+          }
+
+          _value = `${_date}`
+          break
+      case 'array':
+          if(_name.includes('/')) {
+            _key= `"${_name}"`
+          }
+
+          let _tags = inputs[_name]
+          // split tags by "," and make string with double quote
+          _tags = _tags.replace(/ /g, "").split(',')
+          _tags = _tags.map((tag: string) => `"${tag}"`)
+          _value = `[${_tags}]`
+    }
+
+    header += `${_key} = ${_value}\n`
+  })
+  
+  return `+++
+${header}
++++`
+}
+
 function _readBase64(text: string) {
   return Buffer.from(text, 'base64').toString()
+}
+
+function _writeBase64(text: string) {
+  return Buffer.from(text).toString('base64')
+}
+
+function _convertToSlug(body: any) {
+  const slugKey = body.schema.asSlug
+  const slugField = body.inputs[slugKey]
+
+  return slugField.toLowerCase()
+            .replace(/[^\w ]+/g, '')
+            .replace(/ +/g, '-');
 }
 
 // Refactor this to Vercel Handler
@@ -133,44 +249,7 @@ function _readBase64(text: string) {
 //     }
 // }
 
-// const getContent = async(filename = '') => {
-//   let path = repo_dir + filename
 
-//   const {data} = await octokit.rest.repos.getContent({
-//     owner: github_username, 
-//     repo: github_repo,
-//     path: path
-//   });
-
-//   return data
-// }
-
-// const postOrUpdateContent = async(body, method) => {
-//     const filename = body.filename
-//     const originalContent = body.content
-
-//     const content = writeBase64(originalContent)
-//     const path = repo_dir + '/' + filename
-
-//     let params = {
-//         owner: github_username, 
-//         repo: github_repo,
-//         path: path,
-//         message: `new content ${filename}`,
-//         content: content
-//     }
-
-//     if(method == 'PUT') {
-//         params.sha = body.sha
-//         params.message = `update content ${filename}`
-//     }
-
-//     const {data, error} = await octokit.rest.repos.createOrUpdateFileContents(
-//                         params
-//                     )
-//     console.log(error)
-//     return data
-// }
 
 // const deleteContent = async(body, method) => {
 //     const filename = body.filename
@@ -196,12 +275,4 @@ function _readBase64(text: string) {
 //     return false
 
 //   return true
-// }
-
-// function readBase64(str) {
-//     return Buffer.from(str, 'base64').toString()
-// }
-
-// function writeBase64(str) {
-//     return Buffer.from(str).toString('base64')
 // }

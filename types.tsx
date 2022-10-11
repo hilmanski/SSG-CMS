@@ -1,14 +1,16 @@
+import { StringifyOptions } from "querystring"
 
 export interface FieldType {
     name: string
     title: string
-    type: string
+    type: StringifyOptions
     required: boolean
 }
 
 export type SchemaType = {
     name: string
     title: string
+    asSlug: string
     fields: FieldType[]
 }
 

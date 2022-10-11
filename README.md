@@ -1,3 +1,14 @@
+## Now
+- Work on update page
+
+
+## Todo v0.1
+- Create basic MVP
+- Create super clear docs: what's the goal, for whom and how to start
+- Create specific instruction based on SSG used.
+- Get list of file name in /projects to put on dashboard
+
+
 # STATUS
 Under heavy development. Nothing to see yet.
 
@@ -6,7 +17,7 @@ How do you differentiate between projects.
 what's the normal case? people have different projects or only one?
     do based on majority...
 
-If(multiple) -> then dashboard show/choose between repo 
+If (multiple) -> then dashboard show/choose between repo 
     based on file name like NextJS flow repo/[repoName]
  
 ## Rules
@@ -27,11 +38,6 @@ State that this is works for Hugo. (slowly see how other collection handle Hugo)
 - (+) Easy to customize
 - (+) Using uploadcare to easily upload contents
 
-## Todo v0.1
-- Create basic MVP
-- Create super clear docs: what's the goal, for whom and how to start
-- Create specific instruction based on SSG used.
-- Get list of file name in /projects to put on dashboard
 
 ## Technical Plan 
 - User define schema information of their content.
