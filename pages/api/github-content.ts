@@ -9,7 +9,7 @@ const github_access_token = process.env.github_access_token
 const admin_secret_code = process.env.admin_secret_code
 const github_username = CMSConfig.github.username
 
-let github_content_dir = ''
+let github_content_dir: any
 
 const octokit = new Octokit({
   auth: github_access_token,
@@ -27,7 +27,7 @@ export default async function handler(
     })
   }
 
-  github_content_dir = CMSConfig.github.repositories[repository][schema]  
+  github_content_dir = CMSConfig.github?.repositories?.[repository]?.[schema]
   if(!github_content_dir || github_content_dir == '') {
    console.error('Error on getting content dir info @_getContent at API')
    throw new Error('Github Directory Not Found. Check you CMSConfig file')

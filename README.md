@@ -1,4 +1,5 @@
 ## Now
+- Work on get (edit page)
 - Work on update page
 
 
