@@ -5,6 +5,7 @@ import { SchemaType } from '../types'
 export default {
     name: 'post',
     title: 'Post',
+    asSlug: 'title',
     fields: [
       {
         name: 'name',
