@@ -20,7 +20,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
 
-  const { repository, schema } = req.query as {repository: string, schema: string}
+  const { repository, schema, file } = req.query as {repository: string, schema: string, file?: string}
   if(!repository || !schema) {
     res.status(403).json({
       'message': 'Please provide required query param: repository and schema.'
@@ -37,14 +37,17 @@ export default async function handler(
   //====== GET METHOD ===============
   //=================================
   if(req.method == 'GET') {
+
+    console.log('file: ', file)
     // Single Content
-    const {file} = req.query as typeof req.query & {file?: string}
-    if(file !== undefined){
-      const rawContent = await _getContent(repository, '/' + file)
+    if(file !== undefined || file !== '') {
+      const rawContent = await _getContent(repository, '/' + file) as any
       const content = _readBase64(rawContent.content)
+      const dataObject = _desctructureMarkdown(content)
       
       return res.status(200).json({
-          body: content
+          status: 'success',
+          data: dataObject
       });
     }
 
@@ -115,6 +118,30 @@ const _postOrUpdateContent = async(repository: string, body: any, method: string
       return err
   }
   
+}
+
+function _desctructureMarkdown(content: string) {
+  // Todo: work in --- format too
+  const header = content?.match(/(\++.*\++)/gs)
+  if(!header){
+    console.warn('Header is not provided')
+    return {
+      content
+    }
+  }
+
+  const _content_ = content.substring(header[0].length)
+  const _header = header[0].substring(4, header[0].length-4).trim().split(/\n/);
+
+  let headers : any = {}
+  _header.forEach((field: string) => {
+    const [label, value] = field.split(/=\s+/)
+    headers[label] = value
+  });
+
+  return {
+    _content_, headers
+  }
 }
 
 function _generateMarkdown(body: any) {

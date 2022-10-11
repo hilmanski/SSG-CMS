@@ -2,15 +2,17 @@ import { GetServerSideProps } from 'next'
 import { Schemas } from '../schema/_index'
 import Field from '../components/Field'
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react'
 
 
 const DynamicMarkdownEditor = dynamic(() => import('../components/MarkdownEditor'), { ssr: false });
 
-export default function New({repo, schema, file='', sha=''}: 
-    { repo: string, schema: string, file: string, sha: string}) {
-
+export default function New({repository, schema, fileData={}}: 
+    { repository: string, schema: string, fileData: any}) {
+    
     const [_content_, set_content_] = useState('')
+    const initalValue = fileData._content_ ?? 'Today I learn...';
     
     const schemaProp = Schemas[schema]
     if(!schemaProp){
@@ -21,14 +23,7 @@ export default function New({repo, schema, file='', sha=''}:
             </div>
         )
     }
-
-    // Load content if file is not empty
-    if(file != '' && sha != '') {
-        // Load content here
-        //  at backend descturcure back into key-value pair
-    }
-
-
+  
     type Element = {
         [key: string]: any;
     };
@@ -49,7 +44,7 @@ export default function New({repo, schema, file='', sha=''}:
             inputs[_name] = (_element[_name]).value
         });
 
-        fetch(`/api/github-content?repository=${repo}&schema=${schema}`, {
+        fetch(`/api/github-content?repository=${repository}&schema=${schema}`, {
             method: 'POST',
             body: JSON.stringify({
                 inputs: inputs,
@@ -68,7 +63,6 @@ export default function New({repo, schema, file='', sha=''}:
     }
 
     function handleMarkdownContentChange(content: any) {
-        console.log('content', content)
         set_content_(content);
     }
 
@@ -82,7 +76,7 @@ export default function New({repo, schema, file='', sha=''}:
                     if(field.name == '_content_') {
                        return <DynamicMarkdownEditor
                                 key={index}
-                                initialValue='Today I learn...'
+                                initialValue={initalValue}
                                 onChange={handleMarkdownContentChange} />
                     }
                     
@@ -90,8 +84,9 @@ export default function New({repo, schema, file='', sha=''}:
                 })}
 
                 <input type='submit' 
-                        className='p-2 bg-sky-400 w-full rounded-lg mt-3'
-                        value='create' />
+                       value='create'
+                       className='p-2 bg-sky-400 w-full rounded-lg mt-3'
+                        />
             </form>
 
         </div>
@@ -99,12 +94,29 @@ export default function New({repo, schema, file='', sha=''}:
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const repo = context.query.repository
-    const schema = context.query.schema
     
+    const { req } = context;
+    const url = req.headers.referer;
+    const host = url?.includes('localhost') ? `http://${req.headers.host}` : url?.split('https://')[1].split('/')[0]
+
+    const {repository, schema, file, sha} 
+        = context.query as { repository: string, schema: string, file: string, sha:string }
+    
+    let fileData = {}
+
+    if(file != undefined && sha != undefined) {
+        const res = await fetch(`${host}/api/github-content?repository=${repository}&schema=${schema}&file=${file}`)
+        const resJson = await res.json();
+        if(resJson.status != 'success'){
+            console.log(console.error(res))
+        }
+
+        fileData = resJson.data
+    }
+
     return {
         props: {
-            repo, schema
+            repository, schema, fileData
         },
     }
   }

@@ -4,12 +4,13 @@
 - Add protected secret_code
 
 ## Todo v0.1
-- Create basic MVP
+- Create basic MVP (focus for Hugo only)
 - Create super clear docs: what's the goal, for whom and how to start
 - Create specific instruction based on SSG used.
 - Get list of file name in /projects to put on dashboard
 - Delete everything not custom to your usage
 - Fork for your usage, Add CORS for Vercel
+- It should work for [TOML] or [YAML]
 
 # STATUS
 Under heavy development. Nothing to see yet.
@@ -48,15 +49,18 @@ State that this is works for Hugo. (slowly see how other collection handle Hugo)
 - Using Octokit (Github API) to manage content on specific folder.
 - No signup/login. "Auth" replaced with secret_code that stored in localstorage which refers to what in vercel .env 
 
-## On v0.2
+## Raw Ideas v0.2
 - How to make the token only works for certain repo (repo that user gave authorization too). Not general token. Useful?
 - If have enough feedback / many people use it > try to implement as installable package
+- Can schema generated from GUI ?
+    you can! by play with fs
 
 ## Tech
 - [NextJS](https://nextjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/docs/guides/nextjs)
 - [Octokit library](https://docs.github.com/en/rest/overview/libraries)
 - [Hosted on Vercel](https://vercel.com/)
+- [ToastUI Editor](https://ui.toast.com/tui-editor/)
 
 ## Other info 
 Inspiration from [Github Content CRUD API](https://github.com/hilmanski/Github-content-CRUD-API)  
