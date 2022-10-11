@@ -1,18 +1,26 @@
 import { FieldType } from '../types'
 
-export default function Field({ schemaProps }: { schemaProps: FieldType }){
+export default function Field({ schemaProps, initialValue }: { schemaProps: FieldType, initialValue?: any }) {
 
     let fieldString = '' as string;
     switch (schemaProps.type) {
         case 'string':
-            fieldString = `<input type="text" name="${schemaProps.name}" id="${schemaProps.name}" placeholder="${schemaProps.name}" />`
+            fieldString = `<input type="text" name="${schemaProps.name}" id="${schemaProps.name}" 
+                                  placeholder="${schemaProps.name}" 
+                                  value='${initialValue}'
+                                  />`
             break
         case 'text':
-            fieldString = `<textarea placeholder="${schemaProps.name}" name="${schemaProps.name}" id="${schemaProps.name}"></textarea>`
+            fieldString = `<textarea placeholder="${schemaProps.name}" name="${schemaProps.name}" id="${schemaProps.name}">${initialValue}</textarea>`
             break
         case 'array':
             // later user tagify
-            fieldString = `<input type="text" placeholder="${schemaProps.name}" name="${schemaProps.name}" id="${schemaProps.name}" />
+            if(schemaProps.name.includes("/")) {
+                initialValue = `"${initialValue}"`
+            }
+
+            fieldString = `<input type="text" placeholder="${schemaProps.name}" name="${schemaProps.name}" id="${schemaProps.name}"
+                            value='${initialValue}'/>
                  Separate multiple values with comma`
             break
         case 'date':

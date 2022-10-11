@@ -6,10 +6,11 @@ export default function MarkdownEditor({ initialValue, onChange }: { initialValu
   const editorRef = useRef<Editor>(null);
 
   function handleChange() {
-    const md = editorRef?.current
+    const markdownContent = editorRef?.current
       ? editorRef?.current.getInstance().getMarkdown()
       : "";
-    onChange(md);
+
+    onChange(markdownContent)
   }
 
   return (

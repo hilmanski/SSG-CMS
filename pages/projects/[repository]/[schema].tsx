@@ -11,7 +11,7 @@ export default function Page({repo, schema}: { repo: string, schema: string }) {
             .then(res => {
                 setCollections(res.body) 
             })
-    }, [])
+    }, [repo, schema])
         
     return (
         <div className=''>

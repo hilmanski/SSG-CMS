@@ -100,7 +100,6 @@ const _postOrUpdateContent = async(repository: string, body: any, method: string
       message: `new content ${filename}`,
       content: content
   }
-
   
   // if(method == 'PUT') {
   //     params.sha = body.sha
@@ -136,7 +135,7 @@ function _desctructureMarkdown(content: string) {
   let headers : any = {}
   _header.forEach((field: string) => {
     const [label, value] = field.split(/=\s+/)
-    headers[label] = value
+    headers[label.trim()] = value
   });
 
   return {

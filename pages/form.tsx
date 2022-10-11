@@ -13,6 +13,8 @@ export default function New({repository, schema, fileData={}}:
     
     const [_content_, set_content_] = useState('')
     const initalValue = fileData._content_ ?? 'Today I learn...';
+    const initialHeaders = fileData.headers ?? [];
+    console.log('headers', initialHeaders)
     
     const schemaProp = Schemas[schema]
     if(!schemaProp){
@@ -27,7 +29,6 @@ export default function New({repository, schema, fileData={}}:
     type Element = {
         [key: string]: any;
     };
-
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         const target = e.target as HTMLFormElement
@@ -79,8 +80,17 @@ export default function New({repository, schema, fileData={}}:
                                 initialValue={initalValue}
                                 onChange={handleMarkdownContentChange} />
                     }
+
+                    let _value = initialHeaders[field.name]
+                    // For handling edgecase name with "/" backslash
+                    if(field.name.includes("/")) {
+                         _value = initialHeaders['"'+ field.name + '"']
+                    }
                     
-                    return <Field schemaProps={field} key={index} />
+                    return <Field schemaProps={field} 
+                                  key={index} 
+                                  initialValue={_value} 
+                                  />
                 })}
 
                 <input type='submit' 
@@ -94,10 +104,10 @@ export default function New({repository, schema, fileData={}}:
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    
     const { req } = context;
     const url = req.headers.referer;
-    const host = url?.includes('localhost') ? `http://${req.headers.host}` : url?.split('https://')[1].split('/')[0]
+    const host = url?.includes('localhost') ? `http://${req.headers.host}`
+                                            : url?.split('https://')[1].split('/')[0]
 
     const {repository, schema, file, sha} 
         = context.query as { repository: string, schema: string, file: string, sha:string }
