@@ -16,13 +16,13 @@ export default function Page({repo, schema}: { repo: string, schema: string }) {
     return (
         <div className=''>
             <h1 className='text-lg mb-5 font-bold'> Contents </h1>
-            <Link href={`/new?repository=${repo}&schema=${schema}`}>New+</Link>
+            <Link href={`/form?repository=${repo}&schema=${schema}`}>New+</Link>
             {
                 collections.length > 0 ? (
                     collections.map((collection, index) => {
                         return (
                             <Link key={index}
-                                href={`/edit?repository=${repo}&schema=${schema}&file=${collection['name']}&sha=${collection['sha']}`}>
+                                href={`/form?repository=${repo}&schema=${schema}&file=${collection['name']}&sha=${collection['sha']}`}>
                                 <p className='cursor-pointer underline'> {collection['name']}</p>
                             </Link>
                         )

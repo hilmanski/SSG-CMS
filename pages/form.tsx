@@ -1,8 +1,16 @@
 import { GetServerSideProps } from 'next'
 import { Schemas } from '../schema/_index'
 import Field from '../components/Field'
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react'
 
-export default function New({repo, schema}: { repo: string, schema: string }) {
+
+const DynamicMarkdownEditor = dynamic(() => import('../components/MarkdownEditor'), { ssr: false });
+
+export default function New({repo, schema, file='', sha=''}: 
+    { repo: string, schema: string, file: string, sha: string}) {
+
+    const [_content_, set_content_] = useState('')
     
     const schemaProp = Schemas[schema]
     if(!schemaProp){
@@ -13,6 +21,13 @@ export default function New({repo, schema}: { repo: string, schema: string }) {
             </div>
         )
     }
+
+    // Load content if file is not empty
+    if(file != '' && sha != '') {
+        // Load content here
+        //  at backend descturcure back into key-value pair
+    }
+
 
     type Element = {
         [key: string]: any;
@@ -27,6 +42,10 @@ export default function New({repo, schema}: { repo: string, schema: string }) {
         schemaProp.fields.map((key: any) => {
             const _name = key.name as string;
             const _element: Element = target.elements
+
+            if(_name == '_content_')
+                return null
+
             inputs[_name] = (_element[_name]).value
         });
 
@@ -34,14 +53,23 @@ export default function New({repo, schema}: { repo: string, schema: string }) {
             method: 'POST',
             body: JSON.stringify({
                 inputs: inputs,
-                schema: schemaProp
+                schema: schemaProp,
+                content: _content_
             })
         }).then(res => res.json())
            .then(res => {
-                console.log(res)         
+                if(res.status == 'success') {
+                    alert('Successfully push to Github!')
+                    window.location.href='/'
+                }
            }).catch(err => {
                 console.log(err)
             })
+    }
+
+    function handleMarkdownContentChange(content: any) {
+        console.log('content', content)
+        set_content_(content);
     }
 
     return (
@@ -50,14 +78,22 @@ export default function New({repo, schema}: { repo: string, schema: string }) {
 
             <form onSubmit={(e) => handleSubmit(e)}
                 className='flex flex-col space-y-4'>
-                { schemaProp.fields.map((field, index) =>
-                    <Field schemaProps={field} key={index} />
-                )}
+                { schemaProp.fields.map(function(field, index){
+                    if(field.name == '_content_') {
+                       return <DynamicMarkdownEditor
+                                key={index}
+                                initialValue='Today I learn...'
+                                onChange={handleMarkdownContentChange} />
+                    }
+                    
+                    return <Field schemaProps={field} key={index} />
+                })}
 
                 <input type='submit' 
                         className='p-2 bg-sky-400 w-full rounded-lg mt-3'
                         value='create' />
             </form>
+
         </div>
     )
 }

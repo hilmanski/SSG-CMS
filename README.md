@@ -1,14 +1,15 @@
 ## Now
 - Work on get (edit page)
 - Work on update page
-
+- Add protected secret_code
 
 ## Todo v0.1
 - Create basic MVP
 - Create super clear docs: what's the goal, for whom and how to start
 - Create specific instruction based on SSG used.
 - Get list of file name in /projects to put on dashboard
-
+- Delete everything not custom to your usage
+- Fork for your usage, Add CORS for Vercel
 
 # STATUS
 Under heavy development. Nothing to see yet.

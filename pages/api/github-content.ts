@@ -62,7 +62,8 @@ export default async function handler(
   if (req.method === 'POST' || req.method === 'PUT') {
       const data = await _postOrUpdateContent(repository, reqBody, req.method)
       return res.status(200).json(({
-          body: data
+          body: data,
+          status: 'success'
       }))
   }
 }
@@ -121,7 +122,7 @@ function _generateMarkdown(body: any) {
   const inputs = body.inputs
 
   let headerPart: string = __genHeader(schema, inputs)
-  let contentPart: string = inputs._content_
+  let contentPart: string = body.content
 
   return headerPart + '\n' + contentPart
 }
