@@ -6,12 +6,16 @@ export default function Field({ schemaProps, initialValue }: { schemaProps: Fiel
     initialValue = initialValue ?? ''
     switch (schemaProps.type) {
         case 'string':
+            // remove doublequote on first and last char
+            initialValue = initialValue.replace(/^"(.*)"$/, '$1')
+
             fieldString = `<input type="text" name="${schemaProps.name}" id="${schemaProps.name}" 
                                   placeholder="${schemaProps.name}" 
                                   value='${initialValue}'
                                   />`
             break
         case 'text':
+            initialValue = initialValue.replace(/^"(.*)"$/, '$1')
             fieldString = `<textarea placeholder="${schemaProps.name}" name="${schemaProps.name}" id="${schemaProps.name}">${initialValue}</textarea>`
             break
         case 'array':
