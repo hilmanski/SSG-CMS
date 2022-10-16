@@ -1,10 +1,9 @@
 import type { NextPage } from 'next'
 import Link from 'next/link'
-import CMSConfig from '../cms.config'
+import { getRepositories, findRepo } from '../utils/helper'
 
 const Home: NextPage = () => {
-  
-  const repositories = _getObjectKeys(CMSConfig.github.repositories)
+  const repositories = getRepositories()
 
   return (
     <div>
@@ -18,17 +17,13 @@ const Home: NextPage = () => {
       <div className='text-xl'>
       {
         repositories.length > 0 ? (
-          repositories.map(function(repoName: string, index){
-           return (
+          repositories.map((content: any, index: number) => {
+            return (
               <div key={index}>
-                <p>Repository: {repoName}</p>
-                <div className='ml-5'>
-                  {
-                    SchemaComponent(repoName)
-                  }
-                </div>
+                <p>{content.name}</p>
+                <SchemaComponent repoName={content.name as string} />
               </div>
-           )
+            )
         })) 
         : <p> Add your repositories on cms.config.js file </p>
       }
@@ -38,19 +33,27 @@ const Home: NextPage = () => {
   )
 }
 
-function _getObjectKeys(obj: any) {
-  return Object.keys(obj)
-}
+function SchemaComponent({repoName} 
+    : {repoName: string }) {
+    const repository = findRepo(repoName)
 
-function SchemaComponent(repoName: string) {
-  return _getObjectKeys(CMSConfig.github.repositories[repoName])
-            .map((schema, _index) => {
-              return (
-                <Link key={_index} href={`projects/${repoName}/${schema}`}> 
-                  <p className='underline cursor-pointer'> Content: {schema} </p>
-                </Link>            
-              )
-            })
+  return (
+    <div className='ml-5'>
+       {
+          repository?.contents.map((content: any, index: number) => {
+            return (
+              <div key={index}>
+                <Link href={`/projects/${repoName}/${content.name}`}>
+                  <a className='text-xl underline'>
+                    {content.name}
+                  </a>
+                </Link>
+              </div>
+            )
+          })
+        }
+    </div>
+  )
 }
 
 export default Home

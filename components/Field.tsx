@@ -15,9 +15,6 @@ export default function Field({ schemaProps, initialValue }: { schemaProps: Fiel
             break
         case 'array':
             // later user tagify
-            if(schemaProps.name.includes("/")) {
-                initialValue = `"${initialValue}"`
-            }
 
             fieldString = `<input type="text" placeholder="${schemaProps.name}" name="${schemaProps.name}" id="${schemaProps.name}"
                             value='${initialValue}'/>

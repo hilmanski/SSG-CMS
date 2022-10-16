@@ -15,6 +15,9 @@ export default function Page({repo, schema}: { repo: string, schema: string }) {
         
     return (
         <div className=''>
+            <Link href='/'>
+                <p> Back </p>
+            </Link>
             <h1 className='text-lg mb-5 font-bold'> Contents </h1>
             <Link href={`/form?repository=${repo}&schema=${schema}`}>New+</Link>
             {

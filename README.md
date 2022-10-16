@@ -1,5 +1,9 @@
 ## Now
 - Work on get (edit page)
+    next: remove "..."  double quote on initalvalue
+    Document it. For issue. if you/anyone can improve it. By removing this unncessary quote
+        from beginning. So no need to edit it.
+
 - Work on update page
 - Add protected secret_code
 

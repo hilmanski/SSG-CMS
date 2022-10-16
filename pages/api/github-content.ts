@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import dotenv from 'dotenv'
 import { Octokit } from "octokit";
-import CMSConfig from '../../cms.config.js'
-
+import { findContent, getUsername } from '../../utils/helper';
 
 dotenv.config()
 const github_access_token = process.env.github_access_token
 const admin_secret_code = process.env.admin_secret_code
-const github_username = CMSConfig.github.username
+const github_username = getUsername()
 
 let github_content_dir: any
 
@@ -27,7 +26,8 @@ export default async function handler(
     })
   }
 
-  github_content_dir = CMSConfig.github?.repositories?.[repository]?.[schema]
+  github_content_dir = findContent(repository, schema)?.location_dir
+  console.log('github_content_dir: ' ,github_content_dir)
   if(!github_content_dir || github_content_dir == '') {
    console.error('Error on getting content dir info @_getContent at API')
    throw new Error('Github Directory Not Found. Check you CMSConfig file')
@@ -38,9 +38,8 @@ export default async function handler(
   //=================================
   if(req.method == 'GET') {
 
-    console.log('file: ', file)
-    // Single Content
-    if(file !== undefined || file !== '') {
+    if(file !== undefined) {
+      console.log("inside here? ", file)
       const rawContent = await _getContent(repository, '/' + file) as any
       const content = _readBase64(rawContent.content)
       const dataObject = _desctructureMarkdown(content)
