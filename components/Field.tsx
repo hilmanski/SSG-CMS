@@ -3,6 +3,7 @@ import { FieldType } from '../types'
 export default function Field({ schemaProps, initialValue }: { schemaProps: FieldType, initialValue?: any }) {
 
     let fieldString = '' as string;
+    initialValue = initialValue ?? ''
     switch (schemaProps.type) {
         case 'string':
             fieldString = `<input type="text" name="${schemaProps.name}" id="${schemaProps.name}" 

@@ -2,7 +2,6 @@ import { GetServerSideProps } from 'next'
 import { Schemas } from '../schema/_index'
 import Field from '../components/Field'
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react'
 
 
