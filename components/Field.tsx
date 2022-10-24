@@ -4,6 +4,7 @@ export default function Field({ schemaProps, initialValue }: { schemaProps: Fiel
 
     let fieldString = '' as string;
     initialValue = initialValue ?? ''
+
     switch (schemaProps.type) {
         case 'string':
             // remove doublequote on first and last char
@@ -19,6 +20,11 @@ export default function Field({ schemaProps, initialValue }: { schemaProps: Fiel
             initialValue = initialValue.replace(/^"(.*)"$/, '$1')
             fieldString = `<textarea placeholder="${schemaProps.name}" name="${schemaProps.name}" 
                             id="${schemaProps.name}" class='w-full'>${initialValue}</textarea>`
+            break
+        case 'boolean':
+            console.log('initialValue: ' + initialValue)
+            const checked = (initialValue == 'true') ? 'checked' : ''
+            fieldString = `<input type="checkbox" ${checked} name="${schemaProps.name}" id="${schemaProps.name}" />`
             break
         case 'array':
             // later user tagify

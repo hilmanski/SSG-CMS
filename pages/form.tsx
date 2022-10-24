@@ -49,6 +49,12 @@ export default function New({repository, schema, fileData={}, isEdit, sha}:
             if(_name == '_content_')
                 return null
 
+            if(key.type == 'boolean') {
+                const isChecked = _element[_name].checked
+                inputs[_name] = isChecked
+                return
+            }
+
             inputs[_name] = (_element[_name]).value
         });
 
@@ -186,7 +192,7 @@ export default function New({repository, schema, fileData={}, isEdit, sha}:
                 })}
 
                 <input type='submit' 
-                       value={isEdit ? 'create new' : 'Update'}
+                       value={isEdit ? 'Update' : 'Create New' }
                        className='p-2 bg-sky-400 w-full rounded-lg mt-3 cursor-pointer hover:bg-sky-500'
                         />
             </form>

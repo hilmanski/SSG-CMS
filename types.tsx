@@ -26,7 +26,7 @@ export interface FieldType {
     name: string
     title: string
     type: StringifyOptions
-    required: boolean
+    required?: boolean
 }
 
 export type SchemaType = {

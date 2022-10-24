@@ -198,8 +198,11 @@ function __genHeader(schema: any, inputs: any) {
     switch(key.type) {
       case 'string':
       case 'text':
-          _value = `"${inputs[_name]}"`
+          _value = `"${inputs[_name].trim()}"`
           break
+      case 'boolean':
+        _value = inputs[_name] ? 'true' : 'false'
+        break
       case 'date':
           let _date = new Date().toISOString()
           

@@ -36,12 +36,14 @@ export default {
         title: 'Logo (Img)',
         type: 'string',
         required: true,
-      }, {
+      }, 
+      {
         name: 'date',
         title: 'Date',
         type: 'date',
         required: true,
-      }, {
+      }, 
+      {
         name: '_content_',
         title: 'Content',
         type: 'text',

@@ -1,5 +1,8 @@
 ## Now
 
+
+- boolean type for draft example
+
 - Create clear guide and homepage
 - Even better video
 - Ask for beta tester (open for ideas , before wrap as packages)
