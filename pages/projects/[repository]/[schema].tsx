@@ -6,7 +6,7 @@ export default function Page({repo, schema}: { repo: string, schema: string }) {
     const [collections, setCollections] = useState([])
 
     useEffect(() => {
-        fetch(`/api/github-content?repository=${repo}&schema=${schema}`)
+        fetch(`/api/githubCRUD?repository=${repo}&schema=${schema}`)
             .then(res => res.json())
             .then(res => {
                 setCollections(res.body) 

@@ -5,7 +5,6 @@ import { findContent, getUsername } from '../../utils/helper';
 
 dotenv.config()
 const github_access_token = process.env.github_access_token
-const admin_secret_code = process.env.admin_secret_code
 const github_username = getUsername()
 
 let github_content_dir: any
@@ -27,7 +26,6 @@ export default async function handler(
   }
 
   github_content_dir = findContent(repository, schema)?.location_dir
-  console.log('github_content_dir: ' ,github_content_dir)
   if(!github_content_dir || github_content_dir == '') {
    console.error('Error on getting content dir info @_getContent at API')
    throw new Error('Github Directory Not Found. Check you CMSConfig file')
@@ -39,7 +37,6 @@ export default async function handler(
   if(req.method == 'GET') {
 
     if(file !== undefined) {
-      console.log("inside here? ", file)
       const rawContent = await _getContent(repository, '/' + file) as any
       const content = _readBase64(rawContent.content)
       const dataObject = _desctructureMarkdown(content)
@@ -61,12 +58,33 @@ export default async function handler(
   //====== POST AND PUT =============
   //=================================
   const reqBody = req.body
+  const parsedBody = JSON.parse(reqBody)
+  // Password Middleware
+  if (reqBody) {
+    if (_verifySecretCode(parsedBody.secretCode) == false)
+        return res.status(403).send({
+            status: 'error',
+            message: 'WRONG SECRET CODE'
+        })
+  }
+
   if (req.method === 'POST' || req.method === 'PUT') {
-      const data = await _postOrUpdateContent(repository, reqBody, req.method)
+      const data = await _postOrUpdateContent(repository, parsedBody, req.method)
       return res.status(200).json(({
           body: data,
           status: 'success'
       }))
+  }
+
+  //============================
+  //====== DELETE =============
+  //===========================
+  if (req.method === 'DELETE') {
+    const data = await _deleteContent(repository, parsedBody)
+    return res.status(200).json(({
+        body: data,
+        status: 'success'
+    }))
   }
 }
 
@@ -82,9 +100,7 @@ const _getContent = async(repository: string, filename: string = '') => {
   return data
 }
 
-
-const _postOrUpdateContent = async(repository: string, body: any, method: string) => {
-  const parsedBody = JSON.parse(body)
+const _postOrUpdateContent = async(repository: string, parsedBody: any, method: string) => {
   const filename = _convertToSlug(parsedBody) + '.md'
   
   // Todo: generate content here based on markdown and schema/fields
@@ -97,19 +113,18 @@ const _postOrUpdateContent = async(repository: string, body: any, method: string
       repo: repository,
       path: path,
       message: `new content ${filename}`,
-      content: content
+      content: content,
+      sha: undefined
   }
   
-  // if(method == 'PUT') {
-  //     params.sha = body.sha
-  //     params.message = `update content ${filename}`
-  // }
+  if(method == 'PUT') {
+      params.sha = parsedBody.sha
+      params.message = `update content ${filename}`
+  }
 
   try{ 
-    const {data} = await octokit.rest.repos.createOrUpdateFileContents(
-                          params
-                        )
-      return data
+    const {data} = await octokit.rest.repos.createOrUpdateFileContents(params)
+    return data
   } catch(err) {
       console.log("Error create or update file content to github")
       console.log("err response:", err)
@@ -117,6 +132,23 @@ const _postOrUpdateContent = async(repository: string, body: any, method: string
   }
   
 }
+
+
+const _deleteContent = async(repository: string, parsedBody: any) => {
+  const filename = parsedBody.filename
+  const path = github_content_dir + '/' + filename
+
+  const {data} = await octokit.rest.repos.deleteFile({
+                      owner: github_username, 
+                      repo: repository,
+                      path: path,
+                      message: `delete content ${filename}`,
+                      sha: parsedBody.sha
+                  })
+
+  return data
+}
+
 
 function _desctructureMarkdown(content: string) {
   // Todo: work in --- format too
@@ -205,100 +237,21 @@ function _writeBase64(text: string) {
   return Buffer.from(text).toString('base64')
 }
 
-function _convertToSlug(body: any) {
-  const slugKey = body.schema.asSlug
-  const slugField = body.inputs[slugKey]
+function _convertToSlug(parsedBody: any) {
+  const slugKey = parsedBody.schema.asSlug
+  const slugField = parsedBody.inputs[slugKey]
 
   return slugField.toLowerCase()
             .replace(/[^\w ]+/g, '')
             .replace(/ +/g, '-');
 }
 
-// Refactor this to Vercel Handler
+function _verifySecretCode(secretCode: string) {
+  if(secretCode == undefined)
+    return false
 
+  if(process.env.admin_secret_code != secretCode)
+    return false
 
-// module.exports = async (req, res) => {
-    
-//     res.setHeader('Access-Control-Allow-Origin', '*');
-//     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-//     res.setHeader('Access-Control-Allow-Credentials', true);
-//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, OPTIONS, DELETE');
-
-//     if(req.method === 'GET') {
-//         //Single Content
-//         const file = req.query.file
-//         if(file !== undefined) {
-//             const rawContent = await getContent('/' + file)
-//             const content = readBase64(rawContent.content)
-            
-//             return res.status(200).json({
-//                 body: content
-//             });
-//         }
-
-//         //All Content
-//         const files = await getContent()
-//         return res.status(200).json({
-//             body: files
-//         });
-//     }
-
-//     //Admin Middleware
-//     let reqBody = req.body
-    
-//     if (reqBody) {
-//         if (verifySecretCode(reqBody) == false)
-//            return res.status(403).send({
-//                 msg: 'secret code is not provided or wrong'
-//             })
-//     }
-
-//     if (req.method === 'POST' || req.method === 'PUT') {
-//         const data = await postOrUpdateContent(reqBody, req.method)
-//         return res.status(200).json(({
-//             body: data
-//         }))
-//     }
-
-//     if (req.method === 'DELETE') {
-//         const data = await deleteContent(reqBody)
-//         return res.status(200).json(({
-//             body: data
-//         }))
-//     }
-
-//     //Preflight CORS handler
-//     if(req.method === 'OPTIONS') {
-//         return res.status(200).json(({
-//             body: "OK"
-//         }))
-//     }
-// }
-
-
-
-// const deleteContent = async(body, method) => {
-//     const filename = body.filename
-//     const path = repo_dir + '/' + filename
-
-//     const {data, error} = await octokit.rest.repos.deleteFile({
-//                         owner: github_username, 
-//                         repo: github_repo,
-//                         path: path,
-//                         message: `delete content ${filename}`,
-//                         sha: body.sha
-//                     })
-
-//     console.log(error)
-//     return data
-// }
-
-// function verifySecretCode(reqBody) {
-//   if(reqBody.secret_code == undefined)
-//     return false
-
-//   if(admin_secret_code != reqBody.secret_code)
-//     return false
-
-//   return true
-// }
+  return true
+}

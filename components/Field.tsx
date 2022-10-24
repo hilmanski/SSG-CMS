@@ -12,21 +12,27 @@ export default function Field({ schemaProps, initialValue }: { schemaProps: Fiel
             fieldString = `<input type="text" name="${schemaProps.name}" id="${schemaProps.name}" 
                                   placeholder="${schemaProps.name}" 
                                   value='${initialValue}'
+                                  class='w-full'
                                   />`
             break
         case 'text':
             initialValue = initialValue.replace(/^"(.*)"$/, '$1')
-            fieldString = `<textarea placeholder="${schemaProps.name}" name="${schemaProps.name}" id="${schemaProps.name}">${initialValue}</textarea>`
+            fieldString = `<textarea placeholder="${schemaProps.name}" name="${schemaProps.name}" 
+                            id="${schemaProps.name}" class='w-full'>${initialValue}</textarea>`
             break
         case 'array':
             // later user tagify
-
-            fieldString = `<input type="text" placeholder="${schemaProps.name}" name="${schemaProps.name}" id="${schemaProps.name}"
+            // remove bracket [] and quotes
+            initialValue = initialValue.replace(/[\[\]"]+/g, '')
+            fieldString = `<input type="text" placeholder="${schemaProps.name}" name="${schemaProps.name}" 
+                            id="${schemaProps.name}"  class='w-full'
                             value='${initialValue}'/>
                  Separate multiple values with comma`
             break
         case 'date':
-            fieldString = `<input type="datetime-local" placeholder="${schemaProps.name}" name="${schemaProps.name}" id="${schemaProps.name}" />`
+            initialValue = initialValue.replace('Z', '')
+            fieldString = `<input type="datetime-local" placeholder="${schemaProps.name}" name="${schemaProps.name}" 
+                            id="${schemaProps.name}" value='${initialValue}'  class='w-full' />`
             break
     }
 

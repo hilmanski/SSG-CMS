@@ -1,10 +1,9 @@
 ## Now
-- Work on get (edit page)
-    Document it. For issue. if you/anyone can improve it. By removing this unncessary quote
-        from beginning. So no need to edit it.
 
-- Work on update page
-- Add protected secret_code
+- Create clear guide and homepage
+- Even better video
+- Ask for beta tester (open for ideas , before wrap as packages)
+
 
 ## Todo v0.1
 - Create basic MVP (focus for Hugo only)
@@ -35,6 +34,7 @@ It enables developer to easily manage their SSG-contents on Github.
 Don't overclaim.
 State that this is works for Hugo. (slowly see how other collection handle Hugo)
 
+
 ## Benefit
 - (+) Super simple 
 - (+) Free to deploy on Vercel (Self Host)
@@ -50,7 +50,7 @@ State that this is works for Hugo. (slowly see how other collection handle Hugo)
 - This schema consumed by Frontend to generate dynamic form.
 - This schema consumed by Backend to generate markdown files.
 - Using Octokit (Github API) to manage content on specific folder.
-- No signup/login. "Auth" replaced with secret_code that stored in localstorage which refers to what in vercel .env 
+- No signup/login. "Auth" replaced with secret_code that stored in cookue which refers to what in vercel .env 
 
 ## Raw Ideas v0.2
 - How to make the token only works for certain repo (repo that user gave authorization too). Not general token. Useful?
@@ -66,5 +66,26 @@ State that this is works for Hugo. (slowly see how other collection handle Hugo)
 - [ToastUI Editor](https://ui.toast.com/tui-editor/)
 
 ## Other info 
-Inspiration from [Github Content CRUD API](https://github.com/hilmanski/Github-content-CRUD-API)  
+Inspiration from [Github Content CRUD API](https://github.com/hilmanski/githubCRUD-CRUD-API)  
 Question/Feedback -> [Hil](https://twitter.com/hilmanski)
+
+
+## Info
+What is secret code? if anyone know your link, it's the way to protect someone to do anything.
+    correct secret_code must be provided
+
+## Warning (caveat)
+- Title (or anything marked asSlug in schema) when updated, will update the filename as well.
+- [User affected] If a slug contains . (dot), will create a new file when updating
+
+## To improve
+@form schema headers value return with " .. " . How to remove this quotes.
+If you're able, update 2 places:
+1.  at form
+```
+const keySlug = schemaProp.asSlug
+const newTitle = (document.getElementById(keySlug) as HTMLInputElement).value
+const oldTitle = _getTitleForSlug()
+```
+
+2. at field, when displaying initalvalue

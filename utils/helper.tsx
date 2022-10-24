@@ -19,3 +19,4 @@ export function findContent(repoName: string, contentName: string) {
 export function getUsername(): string {
     return CMSConfig.username
 }
+
